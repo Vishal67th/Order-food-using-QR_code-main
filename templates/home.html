@@ -1,0 +1,428 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Order Food Online{% endblock title %}
+
+{% block body %}
+
+<style>
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
+      color: white;
+      padding: 80px 0;
+      text-align: center;
+    }
+    
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .hero p {
+      font-size: 20px;
+      margin-bottom: 30px;
+      opacity: 0.95;
+    }
+    
+    .hero-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .hero-btn {
+      padding: 12px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 25px;
+      transition: 0.3s;
+    }
+    
+    .hero-btn-primary {
+      background-color: #ffb800;
+      color: #000;
+      border: none;
+    }
+    
+    .hero-btn-primary:hover {
+      background-color: #ffa500;
+      transform: translateY(-2px);
+    }
+    
+    .hero-btn-secondary {
+      background-color: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+    
+    .hero-btn-secondary:hover {
+      background-color: rgba(255,255,255,0.1);
+      transform: translateY(-2px);
+    }
+    
+    /* Stats Section */
+    .stats-section {
+      padding: 40px 0;
+      background-color: #fff;
+    }
+    
+    .stat-card {
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .stat-number {
+      font-size: 36px;
+      font-weight: 700;
+      color: #e63946;
+    }
+    
+    .stat-label {
+      font-size: 16px;
+      color: #666;
+      margin-top: 10px;
+    }
+    
+    /* Admin Dashboard */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    
+    .dashboard-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      transition: 0.3s;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .dashboard-card.orders {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+    
+    .dashboard-card.customers {
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+    
+    .dashboard-card.revenue {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+    
+    .dash-number {
+      font-size: 42px;
+      font-weight: 800;
+      margin: 15px 0;
+    }
+    
+    .dash-label {
+      font-size: 16px;
+      opacity: 0.95;
+    }
+    
+    /* Customer Welcome */
+    .customer-welcome {
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400"><path fill="%23e63946" opacity="0.1" d="M0,200 Q300,100 600,200 T1200,200 L1200,400 L0,400 Z"/></svg>');
+      background-size: cover;
+      padding: 60px 0;
+      text-align: center;
+    }
+    
+    .customer-welcome h1 {
+      font-size: 42px;
+      font-weight: 800;
+      color: #e63946;
+      margin-bottom: 20px;
+    }
+    
+    .customer-welcome p {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
+      color: white;
+      padding: 15px 50px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+      box-shadow: 0 5px 15px rgba(230,57,70,0.3);
+    }
+    
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(230,57,70,0.4);
+      color: white;
+    }
+    
+    /* Category Filter Section */
+    .category-filter-section {
+      background: white;
+      padding: 40px 0;
+      margin-top: -20px;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 -5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .category-scroll {
+      display: flex;
+      gap: 30px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      padding: 0 10px;
+    }
+    
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      text-align: center;
+    }
+    
+    .category-item:hover {
+      transform: translateY(-5px);
+    }
+    
+    .category-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .category-item:hover .category-image {
+      box-shadow: 0 4px 16px rgba(230,57,70,0.2);
+      transform: scale(1.05);
+    }
+    
+    .category-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 5px;
+      transition: all 0.3s ease;
+    }
+    
+    .category-item:hover .category-name {
+      color: #e63946;
+    }
+    
+    .category-item.active .category-image {
+      background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
+      color: white;
+      box-shadow: 0 4px 16px rgba(230,57,70,0.3);
+    }
+    
+    .category-item.active .category-name {
+      color: #e63946;
+      font-weight: 700;
+    }
+    
+    .category-indicator {
+      width: 50px;
+      height: 3px;
+      background: #27ae60;
+      border-radius: 2px;
+      margin-top: 8px;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .category-item.active .category-indicator {
+      opacity: 1;
+    }
+    
+</style>
+
+{% if user.is_superuser %}
+  <!-- Admin Dashboard -->
+  <div class="container">
+    <h2 class="mb-4" style="color: #e63946; font-weight: 800;">📊 Admin Dashboard</h2>
+    
+    <div class="dashboard-cards">
+      <div class="dashboard-card orders">
+        <i class="fas fa-shopping-bag" style="font-size: 36px; margin-bottom: 10px;"></i>
+        <div class="dash-number">{{ total_orders }}</div>
+        <div class="dash-label">Total Orders Placed</div>
+      </div>
+      
+      <div class="dashboard-card customers">
+        <i class="fas fa-users" style="font-size: 36px; margin-bottom: 10px;"></i>
+        <div class="dash-number">{{ total_customers }}</div>
+        <div class="dash-label">Registered Customers</div>
+      </div>
+      
+      <div class="dashboard-card revenue">
+        <i class="fas fa-rupee-sign" style="font-size: 36px; margin-bottom: 10px;"></i>
+        <div class="dash-number">₹{{ total_revenue }}</div>
+        <div class="dash-label">Total Revenue</div>
+      </div>
+    </div>
+
+    <div class="row mt-5">
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-lg border-0">
+          <div class="card-header" style="background: linear-gradient(135deg, #e63946, #d62828); color: white;">
+            <h5 class="mb-0"><i class="fas fa-cogs"></i> Quick Actions</h5>
+          </div>
+          <div class="card-body">
+            <a href="/all_orders" class="btn btn-primary mb-3 w-100"><i class="fas fa-list"></i> View All Orders</a>
+            <a href="/manage_menu" class="btn btn-success mb-3 w-100"><i class="fas fa-plus"></i> Add New Menu Item</a>
+            <a href="/view_bills" class="btn btn-info mb-3 w-100"><i class="fas fa-file-invoice"></i> View Bills</a>
+            <a href="/menu" class="btn btn-warning w-100"><i class="fas fa-utensils"></i> View Menu</a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6 mb-4">
+        <div class="card shadow-lg border-0">
+          <div class="card-header" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+            <h5 class="mb-0"><i class="fas fa-info-circle"></i> System Info</h5>
+          </div>
+          <div class="card-body">
+            <p><i class="fas fa-check-circle text-success"></i> <strong>Server Status:</strong> Running ✓</p>
+            <p><i class="fas fa-database text-info"></i> <strong>Database:</strong> SQLite3 ✓</p>
+            <p><i class="fas fa-qrcode text-warning"></i> <strong>QR Code:</strong> Enabled ✓</p>
+            <p><i class="fas fa-shield-alt text-danger"></i> <strong>Security:</strong> Encrypted ✓</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% else %}
+  <!-- Customer View -->
+  <div class="hero">
+    <div class="container">
+      <h1>🍔 Hungry?</h1>
+      <p>Delicious food at your fingertips</p>
+      <div class="hero-buttons">
+        <a href="/menu" class="hero-btn hero-btn-primary">Order Now</a>
+        <a href="/reviews" class="hero-btn hero-btn-secondary">Read Reviews</a>
+      </div>
+    </div>
+  </div>
+
+  
+  
+  <script>
+    // More dropdown toggle
+    const moreDropdown = document.getElementById('moreDropdown');
+    const dropdownContent = document.querySelector('.more-dropdown-content');
+    
+    if (moreDropdown) {
+      moreDropdown.addEventListener('mouseenter', function() {
+        dropdownContent.style.display = 'block';
+      });
+      moreDropdown.addEventListener('mouseleave', function() {
+        dropdownContent.style.display = 'none';
+      });
+    }
+    
+    // Highlight active category based on URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const activeCategory = urlParams.get('category');
+    if (activeCategory) {
+      document.querySelectorAll('.category-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.textContent.includes(activeCategory.split(' ')[0])) {
+          item.classList.add('active');
+        }
+      });
+    }
+  </script>
+
+  <!-- Stats Section -->
+  <div class="stats-section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="stat-card">
+            <i class="fas fa-utensils" style="font-size: 42px; color: #e63946;"></i>
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Menu Items</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <i class="fas fa-clock" style="font-size: 42px; color: #e63946;"></i>
+            <div class="stat-number">30 min</div>
+            <div class="stat-label">Average Delivery</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <i class="fas fa-star" style="font-size: 42px; color: #e63946;"></i>
+            <div class="stat-number">4.8★</div>
+            <div class="stat-label">Rating</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Featured Section -->
+  <div class="customer-welcome">
+    <div class="container">
+      <h1>Featured This Week</h1>
+      <p>Check out our latest menu items and special offers</p>
+      <a href="/menu" class="cta-button">Explore Menu →</a>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <div class="container mt-5 mb-5">
+    <div class="row align-items-center">
+      <div class="col-md-6">
+        <img src="/static/logo.png" class="img-fluid rounded-3" alt="Home of Flavours" style="max-width: 80%; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+      </div>
+      <div class="col-md-6">
+        <h2 style="color: #e63946; font-weight: 800; margin-bottom: 20px;">About Home of Flavours</h2>
+        <p style="font-size: 16px; color: #666; line-height: 1.8;">
+          Welcome to Home of Flavours - Your favorite food ordering platform! 
+          We bring delicious food straight to your table with fast delivery, 
+          secure payments, and excellent customer service.
+        </p>
+        <ul style="font-size: 16px; color: #666;">
+          <li><i class="fas fa-check-circle" style="color: #e63946;"></i> Fast & Fresh Food</li>
+          <li><i class="fas fa-check-circle" style="color: #e63946;"></i> Wide Menu Selection</li>
+          <li><i class="fas fa-check-circle" style="color: #e63946;"></i> Quick Delivery</li>
+          <li><i class="fas fa-check-circle" style="color: #e63946;"></i> Easy Ordering</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{% endif %}
+
+{% endblock body %}

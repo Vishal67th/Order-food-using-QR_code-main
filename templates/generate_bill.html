@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Bill{% endblock title %}
+
+{%block body%}
+
+{% for message in messages %}
+    <div class="alert alert-success alert-dismissable fade show" role="alert">
+        <strong>{{message}}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endfor %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">Invoice #{{ inv_id }}</h3>
+                </div>
+                <div class="card-body">
+                    {% if name != "Unknown" %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Customer Name:</strong> {{ name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Phone:</strong> {{ phone }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Quantity</th>
+                                <th>Total (₹)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in order_dict.items %}
+                            <tr>
+                                <td>{{ key }}</td>
+                                <td>{{ value.0 }}</td>
+                                <td>₹{{ value.1 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- ✅ Bill Summary with tax breakdown -->
+                    <div class="row justify-content-end">
+                        <div class="col-md-5">
+                            <table class="table table-sm">
+                                <tr>
+                                    <td class="text-muted">Subtotal</td>
+                                    <td class="text-end">₹{{ bill_subtotal }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Tax (5%)</td>
+                                    <td class="text-end">₹{{ bill_tax }}</td>
+                                </tr>
+                                <tr class="table-dark">
+                                    <td><strong>Total</strong></td>
+                                    <td class="text-end"><strong>₹{{ bill_total }}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <button onclick="printBill()" class="btn btn-primary">Print Bill</button>
+                        <a href="/all_orders" class="btn btn-secondary">Back to Orders</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{%endblock body%}
+
+{% block js %}
+<script>
+    function printBill() {
+        window.print();
+    }
+</script>
+{%endblock js%}

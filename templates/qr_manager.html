@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}QR Code Manager - Home of Flavours{% endblock title %}
+
+{% block body %}
+<style>
+  .qr-header {
+    background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
+    color: white;
+    padding: 30px 0;
+    margin-bottom: 40px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .qr-header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .qr-card {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+    padding: 28px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .qr-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.13);
+  }
+
+  .qr-card img {
+    width: 160px;
+    height: 160px;
+    border: 3px solid #f0f0f0;
+    border-radius: 10px;
+    margin-bottom: 14px;
+  }
+
+  .table-label {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 4px;
+  }
+
+  .table-url {
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 14px;
+    word-break: break-all;
+  }
+
+  .btn-download {
+    background: linear-gradient(135deg, #e63946, #d62828);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: 0.2s;
+  }
+
+  .btn-download:hover {
+    opacity: 0.88;
+    color: white;
+    transform: scale(0.97);
+  }
+
+  .section-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 22px;
+  }
+
+  .admin-notice {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 30px;
+    font-size: 14px;
+    color: #856404;
+  }
+
+  .custom-gen-box {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.09);
+    padding: 28px;
+    margin-bottom: 40px;
+  }
+
+  .custom-gen-box input[type=number] {
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 15px;
+    width: 120px;
+    outline: none;
+    transition: border 0.2s;
+  }
+
+  .custom-gen-box input[type=number]:focus {
+    border-color: #e63946;
+  }
+
+  .btn-generate {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-left: 10px;
+  }
+
+  .btn-generate:hover {
+    opacity: 0.88;
+    transform: scale(0.97);
+  }
+
+  #customQrResult {
+    margin-top: 24px;
+    display: none;
+    text-align: center;
+  }
+
+  #customQrResult img {
+    width: 180px;
+    height: 180px;
+    border: 3px solid #f0f0f0;
+    border-radius: 10px;
+    margin-bottom: 12px;
+  }
+</style>
+
+<div class="qr-header text-center">
+  <div class="container">
+    <i class="fas fa-qrcode" style="font-size: 36px; margin-right: 10px;"></i>
+    <h1>QR Code Manager</h1>
+    <p class="mt-2 mb-0" style="opacity:0.85;">Generate & download QR codes for each table</p>
+  </div>
+</div>
+
+<div class="container mb-5">
+
+  {% if not request.user.is_superuser %}
+  <div class="admin-notice">
+    <i class="fas fa-lock"></i>
+    <strong>Admin only.</strong> You need superuser access to generate QR codes.
+    <a href="/login" class="ms-2" style="color:#e63946;">Login as Admin</a>
+  </div>
+  {% endif %}
+
+  <!-- Custom Table QR Generator -->
+  <div class="custom-gen-box">
+    <div class="section-title">
+      <i class="fas fa-magic" style="color:#764ba2;"></i> Generate QR for Any Table
+    </div>
+    <div class="d-flex align-items-center flex-wrap gap-2">
+      <label style="font-weight:600; color:#444;">Table Number:</label>
+      <input type="number" id="customTableNum" min="1" max="100" value="1" placeholder="e.g. 5">
+      <button class="btn-generate" onclick="generateCustomQR()">
+        <i class="fas fa-qrcode"></i> Generate
+      </button>
+    </div>
+
+    <div id="customQrResult">
+      <img id="customQrImg" src="" alt="QR Code">
+      <div class="table-label" id="customQrLabel"></div>
+      <div class="table-url" id="customQrUrl"></div>
+      <a id="customQrDownload" class="btn-download" download>
+        <i class="fas fa-download"></i> Download QR
+      </a>
+    </div>
+  </div>
+
+  <!-- Pre-generated QR for Tables 1-10 -->
+  <div class="section-title">
+    <i class="fas fa-table" style="color:#e63946;"></i> Tables 1 - 10
+  </div>
+  <div class="row g-4 mb-5">
+    {% for i in table_range %}
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+      <div class="qr-card">
+        <img src="/qr_code/{{ i }}" alt="QR Table {{ i }}">
+        <div class="table-label">Table {{ i }}</div>
+        <div class="table-url">{{ request.scheme }}://{{ request.get_host }}/menu?table={{ i }}</div>
+        <button class="btn-download" onclick="downloadQR({{ i }})">
+          <i class="fas fa-download"></i> Download
+        </button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock body %}
+
+{% block js %}
+<script>
+  function generateCustomQR() {
+    const tableNum = document.getElementById('customTableNum').value;
+    if (!tableNum || tableNum < 1) {
+      alert('Please enter a valid table number.');
+      return;
+    }
+
+    const qrUrl = `/qr_code/${tableNum}`;
+    const menuUrl = `${window.location.protocol}//${window.location.host}/menu?table=${tableNum}`;
+
+    const img = document.getElementById('customQrImg');
+    img.src = qrUrl;
+    img.onload = function () {
+      document.getElementById('customQrLabel').textContent = `Table ${tableNum}`;
+      document.getElementById('customQrUrl').textContent = menuUrl;
+
+      fetch(qrUrl)
+        .then(res => res.blob())
+        .then(blob => {
+          const blobUrl = URL.createObjectURL(blob);
+          const dlLink = document.getElementById('customQrDownload');
+          dlLink.href = blobUrl;
+          dlLink.download = `table_${tableNum}_qr.png`;
+        });
+
+      document.getElementById('customQrResult').style.display = 'block';
+    };
+  }
+
+  // Force download so browser doesn't open image in a new tab
+  function downloadQR(tableNum) {
+    fetch(`/qr_code/${tableNum}`)
+      .then(res => res.blob())
+      .then(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = `table_${tableNum}_qr.png`;
+        a.click();
+        URL.revokeObjectURL(blobUrl);
+      });
+  }
+</script>
+{% endblock js %}

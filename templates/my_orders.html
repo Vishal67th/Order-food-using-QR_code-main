@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - Food Ordering System{% endblock title %}
+
+{% block body %}
+
+<style>
+  .orders-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px 0;
+    margin-bottom: 40px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .orders-header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .order-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    margin-bottom: 20px;
+  }
+
+  .order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+  }
+
+  .order-card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .order-table-info {
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .order-time {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+
+  .order-card-body {
+    padding: 20px;
+  }
+
+  .order-items-title {
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .order-items-title i {
+    color: #667eea;
+  }
+
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+  }
+
+  .order-item:last-child {
+    border-bottom: none;
+  }
+
+  .order-item-name {
+    font-weight: 500;
+    color: #333;
+    flex: 1;
+  }
+
+  .order-item-qty {
+    background: #667eea;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 12px;
+    margin: 0 10px;
+    min-width: 30px;
+    text-align: center;
+  }
+
+  .order-item-price {
+    color: #667eea;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  .order-card-footer {
+    background: #f9f9f9;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .order-total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .order-total-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+  }
+
+  .order-total-amount {
+    font-size: 22px;
+    font-weight: 800;
+    color: #667eea;
+  }
+
+  .empty-orders {
+    text-align: center;
+    padding: 60px 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  }
+
+  .empty-orders i {
+    font-size: 64px;
+    color: #ddd;
+    margin-bottom: 20px;
+    display: block;
+  }
+
+  .empty-orders p {
+    font-size: 18px;
+    color: #999;
+    margin-bottom: 30px;
+  }
+
+  .order-section-header {
+    background: white;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    border-left: 4px solid #667eea;
+  }
+
+  .order-section-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .order-section-header i {
+    color: #667eea;
+    font-size: 24px;
+  }
+
+  .badge-table {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .continue-btn {
+    background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    transition: 0.3s;
+    margin-top: 20px;
+  }
+
+  .continue-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230,57,70,0.3);
+    text-decoration: none;
+    color: white;
+  }
+
+  .no-orders-section {
+    margin: 40px 0;
+  }
+
+  @media (max-width: 768px) {
+    .orders-header h1 {
+      font-size: 28px;
+    }
+
+    .order-card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .order-card-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 15px;
+    }
+
+    .order-total {
+      align-items: flex-start;
+    }
+  }
+</style>
+
+<!-- Success/Error Messages -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+      <strong>{{ message }}</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Header -->
+<div class="orders-header text-center">
+  <div class="container">
+    <i class="fas fa-list-check" style="font-size: 36px; margin-right: 10px; margin-bottom: 10px;"></i>
+    <h1>Your Orders</h1>
+  </div>
+</div>
+
+<div class="container mb-5">
+  <!-- Orders Display -->
+  {% if order_by_table %}
+    {% for table, orders in order_by_table.items %}
+      <!-- Section Header -->
+      <div class="order-section-header">
+        <h3>
+          {% if table == 'Take Away' %}
+            <i class="fas fa-bag-shopping"></i> Take Away Orders
+          {% else %}
+            <i class="fas fa-utensils"></i> Table No: 
+            <span class="badge-table">{{ table }}</span>
+          {% endif %}
+        </h3>
+      </div>
+
+      <!-- Orders for this table -->
+      {% for o in orders %}
+        {% if o.items_json %}
+          <div class="order-card">
+            <!-- Order Header -->
+            <div class="order-card-header">
+              <div class="order-table-info">
+                Order #{{ o.order_id }}
+                {% if o.name and o.name != 'Unknown' %}
+                  • {{ o.name }}
+                {% endif %}
+              </div>
+              <div class="order-time">
+                <i class="fas fa-clock"></i> {{ o.order_time|date:"d M, Y H:i" }}
+              </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="order-card-body">
+              <div class="order-items-title">
+                <i class="fas fa-list"></i> Order Items
+              </div>
+
+              {% for item_key, item_values in o.items_json.items %}
+                <div class="order-item">
+                  <span class="order-item-name">
+                    {{ item_values.1|title }}
+                  </span>
+                  <span class="order-item-qty">
+                    x{{ item_values.0 }}
+                  </span>
+                  <span class="order-item-price">
+                    ₹{{ item_values.2 }}
+                  </span>
+                </div>
+              {% endfor %}
+            </div>
+
+            <!-- Order Footer -->
+            <div class="order-card-footer">
+              <div>
+                {% if o.bill_clear %}
+                  <span style="color: #28a745; font-weight: 600;">
+                    <i class="fas fa-check-circle"></i> Bill Cleared
+                  </span>
+                {% else %}
+                  <span style="color: #ff9800; font-weight: 600;">
+                    <i class="fas fa-hourglass-half"></i> Pending
+                  </span>
+                {% endif %}
+              </div>
+              <div class="order-total">
+                <span class="order-total-label">Order Total</span>
+                <span class="order-total-amount">₹{{ o.price }}</span>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+
+  {% else %}
+    <!-- No Orders State -->
+    <div class="no-orders-section">
+      <div class="empty-orders">
+        <i class="fas fa-inbox"></i>
+        <p><strong>No orders yet!</strong></p>
+        <p style="color: #666; margin-bottom: 30px;">Start exploring our delicious menu and place your first order.</p>
+        <a href="/menu" class="continue-btn">
+          <i class="fas fa-utensils"></i> Browse Menu
+        </a>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Continue Ordering Button -->
+  {% if order_by_table %}
+    <div style="margin-top: 40px; text-align: center;">
+      <a href="/menu" class="continue-btn">
+        <i class="fas fa-plus-circle"></i> Place Another Order
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+{%endblock body%}

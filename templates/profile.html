@@ -1,0 +1,670 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile — Home of Flavours{% endblock title %}
+
+{% block body %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+
+  :root {
+    --zred: #e23744;
+    --zred-dark: #c0392b;
+    --zgold: #f4a92a;
+    --zgreen: #3d9b6d;
+    --zsurface: #f4f4f4;
+    --zcard: #ffffff;
+    --zinc: #1c1c1c;
+    --zmuted: #7b7b7b;
+    --zborder: #ebebeb;
+    --radius: 18px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --shadow-md: 0 8px 32px rgba(0,0,0,0.11);
+  }
+
+  * { box-sizing: border-box; }
+
+  .profile-page {
+    font-family: 'Nunito', sans-serif;
+    background: var(--zsurface);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ── TOAST ── */
+  .toast-area {
+    position: fixed; top: 76px; right: 20px; z-index: 9999;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .z-toast {
+    background: #1c1c1c; color: #fff;
+    padding: 14px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 700;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    animation: toastIn 0.35s ease both;
+    max-width: 340px;
+  }
+  .z-toast.err { background: #c0392b; }
+  @keyframes toastIn {
+    from { transform: translateX(60px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+  }
+
+  /* ── COVER ── */
+  .profile-cover {
+    height: 200px;
+    background: linear-gradient(135deg, #e23744 0%, #c0392b 50%, #7b1e1e 100%);
+    position: relative; overflow: hidden;
+  }
+  .cover-pattern {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.07) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.05) 0%, transparent 40%);
+  }
+  .cover-dots {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(255,255,255,0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* ── CONTAINER ── */
+  .profile-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ── AVATAR ── */
+  .avatar-section {
+    display: flex; align-items: flex-end; gap: 20px;
+    margin-top: -54px; margin-bottom: 28px;
+    position: relative; z-index: 5; flex-wrap: wrap;
+  }
+  .avatar-ring {
+    width: 108px; height: 108px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--zred), #7b1e1e);
+    padding: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); flex-shrink: 0;
+  }
+  .avatar-inner {
+    width: 100%; height: 100%; border-radius: 50%;
+    background: linear-gradient(135deg, #e23744, #c0392b);
+    border: 3px solid #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 38px; font-weight: 900; color: white; letter-spacing: -1px;
+  }
+  .avatar-meta { flex: 1; padding-bottom: 6px; }
+  .profile-name { font-size: 26px; font-weight: 900; color: var(--zinc); letter-spacing: -0.7px; line-height: 1.1; margin-bottom: 4px; }
+  .profile-handle { font-size: 13px; color: var(--zmuted); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .verified-badge {
+    background: rgba(61,155,109,0.1); color: var(--zgreen);
+    font-size: 11px; font-weight: 800;
+    padding: 3px 9px; border-radius: 50px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .profile-edit-btn { margin-left: auto; padding-bottom: 6px; }
+  .outline-btn {
+    background: white; border: 1.5px solid var(--zborder);
+    border-radius: 10px; padding: 9px 18px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 800; color: var(--zinc);
+    cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 7px;
+    transition: 0.2s; box-shadow: var(--shadow);
+  }
+  .outline-btn:hover { border-color: var(--zred); color: var(--zred); }
+
+  /* ── STATS ── */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 14px; margin-bottom: 20px;
+  }
+  .stat-tile {
+    background: var(--zcard); border-radius: var(--radius);
+    border: 1px solid var(--zborder); box-shadow: var(--shadow);
+    padding: 20px; text-align: center; transition: 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .stat-tile::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .stat-tile.s1::before { background: linear-gradient(90deg,#e23744,#f5576c); }
+  .stat-tile.s2::before { background: linear-gradient(90deg,#f4a92a,#f9d423); }
+  .stat-tile.s3::before { background: linear-gradient(90deg,#3d9b6d,#38f9d7); }
+  .stat-tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+  .stat-icon-wrap {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin: 0 auto 12px;
+  }
+  .s1 .stat-icon-wrap { background: rgba(226,55,68,0.08); }
+  .s2 .stat-icon-wrap { background: rgba(244,169,42,0.1); }
+  .s3 .stat-icon-wrap { background: rgba(61,155,109,0.1); }
+  .stat-value { font-size: 30px; font-weight: 900; color: var(--zinc); letter-spacing: -1px; line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--zmuted); font-weight: 700; margin-top: 5px; }
+
+  /* ── PANEL ── */
+  .profile-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-bottom: 16px;
+  }
+  .panel {
+    background: var(--zcard); border-radius: var(--radius);
+    border: 1px solid var(--zborder); box-shadow: var(--shadow); overflow: hidden;
+  }
+  .panel-header {
+    padding: 16px 22px; border-bottom: 1px solid var(--zborder);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .panel-icon {
+    width: 32px; height: 32px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .pi-red  { background: rgba(226,55,68,0.08); color: var(--zred); }
+  .pi-blue { background: rgba(79,172,254,0.1); color: #2d82d2; }
+  .panel-title { font-size: 15px; font-weight: 800; color: var(--zinc); }
+  .panel-body { padding: 6px 12px 14px; }
+  .info-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 10px; border-radius: 10px; transition: 0.15s;
+  }
+  .info-row:hover { background: #fafafa; }
+  .info-key { font-size: 13px; font-weight: 700; color: var(--zmuted); display: flex; align-items: center; gap: 8px; }
+  .info-val { font-size: 14px; font-weight: 800; color: var(--zinc); text-align: right; }
+
+  /* ── ACTIONS ── */
+  .actions-panel {
+    background: var(--zcard); border-radius: var(--radius);
+    border: 1px solid var(--zborder); box-shadow: var(--shadow);
+    padding: 16px; margin-bottom: 16px;
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+  .action-tile {
+    flex: 1; min-width: 140px;
+    background: var(--zsurface); border: 1.5px solid var(--zborder);
+    border-radius: 14px; padding: 16px 14px;
+    text-align: center; text-decoration: none;
+    color: var(--zinc); font-weight: 800; font-size: 13px;
+    transition: 0.2s; display: flex; flex-direction: column;
+    align-items: center; gap: 10px; cursor: pointer; font-family: 'Nunito', sans-serif;
+  }
+  .action-tile-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .action-tile:hover {
+    background: white; border-color: var(--zred); color: var(--zred);
+    transform: translateY(-2px); box-shadow: 0 6px 20px rgba(226,55,68,0.12);
+  }
+  .action-tile:hover .action-tile-icon { background: rgba(226,55,68,0.08) !important; }
+
+  /* ── MEMBER STRIP ── */
+  .member-strip {
+    background: linear-gradient(135deg, var(--zinc) 0%, #2c2c2c 100%);
+    border-radius: var(--radius); padding: 20px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .member-left { display: flex; align-items: center; gap: 14px; }
+  .member-badge-icon {
+    width: 48px; height: 48px; background: rgba(244,169,42,0.15);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .member-text strong { display: block; font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 2px; }
+  .member-text span { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 600; }
+  .member-chip {
+    background: rgba(244,169,42,0.15); border: 1.5px solid rgba(244,169,42,0.3);
+    color: var(--zgold); font-size: 12px; font-weight: 800;
+    padding: 6px 16px; border-radius: 50px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+
+  /* ══════════════════════════════════════════
+     EDIT MODE STYLES
+  ══════════════════════════════════════════ */
+  .form-card {
+    background: var(--zcard); border-radius: var(--radius);
+    border: 1px solid var(--zborder); box-shadow: var(--shadow);
+    overflow: hidden; margin-bottom: 16px;
+  }
+  .form-card-header {
+    padding: 16px 22px; border-bottom: 1px solid var(--zborder);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .form-card-icon {
+    width: 32px; height: 32px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; font-size: 14px;
+  }
+  .fci-red  { background: rgba(226,55,68,0.08); color: var(--zred); }
+  .fci-blue { background: rgba(79,172,254,0.1); color: #2d82d2; }
+  .fci-dark { background: rgba(28,28,28,0.07);  color: var(--zinc); }
+  .form-card-title { font-size: 15px; font-weight: 800; color: var(--zinc); }
+  .form-card-body { padding: 20px 22px; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .field-row.full { grid-template-columns: 1fr; }
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-label {
+    font-size: 12px; font-weight: 800; color: var(--zmuted);
+    text-transform: uppercase; letter-spacing: 0.6px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .field-input {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--zborder); border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 700; color: var(--zinc);
+    background: #fafafa; outline: none; transition: 0.2s;
+  }
+  .field-input:focus {
+    border-color: var(--zred); background: #fff;
+    box-shadow: 0 0 0 3px rgba(226,55,68,0.08);
+  }
+  .field-input::placeholder { color: #bbb; font-weight: 600; }
+  .field-hint { font-size: 11px; color: var(--zmuted); font-weight: 600; }
+
+  .pw-wrap { position: relative; }
+  .pw-toggle {
+    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--zmuted);
+    font-size: 14px; padding: 0; line-height: 1;
+  }
+  .pw-toggle:hover { color: var(--zred); }
+
+  .pw-strength-bar { height: 4px; border-radius: 4px; background: var(--zborder); margin-top: 6px; overflow: hidden; }
+  .pw-strength-fill { height: 100%; border-radius: 4px; width: 0%; transition: width 0.3s, background 0.3s; }
+  .pw-strength-label { font-size: 11px; font-weight: 700; margin-top: 4px; color: var(--zmuted); }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 6px 0 16px; }
+  .divider-line { flex: 1; height: 1px; background: var(--zborder); }
+  .divider-text { font-size: 11px; font-weight: 800; color: var(--zmuted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; padding: 0 22px 22px; }
+  .btn-save {
+    flex: 1; min-width: 140px;
+    background: linear-gradient(135deg, var(--zred), var(--zred-dark));
+    color: white; border: none; padding: 14px 24px; border-radius: 13px;
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900;
+    cursor: pointer; letter-spacing: 0.2px;
+    box-shadow: 0 4px 16px rgba(226,55,68,0.3); transition: 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(226,55,68,0.35); }
+  .btn-cancel {
+    background: white; border: 1.5px solid var(--zborder); border-radius: 13px;
+    padding: 14px 22px; font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 800; color: var(--zmuted);
+    cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--zinc); color: var(--zinc); }
+
+  .danger-note {
+    background: rgba(226,55,68,0.04); border: 1px solid rgba(226,55,68,0.15);
+    border-radius: 12px; padding: 12px 16px;
+    font-size: 12px; font-weight: 700; color: #b02530;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+
+  /* ── SECTION VISIBILITY ── */
+  #view-mode, #edit-mode { transition: opacity 0.25s; }
+  #edit-mode { display: none; }
+
+  /* ── ANIMATIONS ── */
+  .fade-up { opacity: 0; transform: translateY(20px); animation: fu 0.45s ease forwards; }
+  @keyframes fu { to { opacity: 1; transform: translateY(0); } }
+  .d1{animation-delay:.05s} .d2{animation-delay:.10s}
+  .d3{animation-delay:.15s} .d4{animation-delay:.20s}
+  .d5{animation-delay:.25s} .d6{animation-delay:.30s}
+
+  @media (max-width: 640px) {
+    .stats-row    { grid-template-columns: 1fr 1fr; }
+    .profile-grid { grid-template-columns: 1fr; }
+    .profile-name { font-size: 20px; }
+    .avatar-ring  { width: 86px; height: 86px; }
+    .avatar-inner { font-size: 28px; }
+    .field-row    { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="profile-page">
+
+  <!-- TOASTS -->
+  <div class="toast-area">
+    {% for message in messages %}
+      <div class="z-toast {% if 'error' in message.tags %}err{% endif %}">
+        {% if 'error' in message.tags %}❌{% else %}✅{% endif %} {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- COVER -->
+  <div class="profile-cover">
+    <div class="cover-pattern"></div>
+    <div class="cover-dots"></div>
+  </div>
+
+  <div class="profile-container">
+
+    <!-- AVATAR (always visible) -->
+    <div class="avatar-section fade-up">
+      <div class="avatar-ring">
+        <div class="avatar-inner">
+          {{ request.user.first_name|slice:":1"|upper }}{{ request.user.last_name|slice:":1"|upper }}
+        </div>
+      </div>
+      <div class="avatar-meta">
+        <div class="profile-name">{{ request.user.first_name }} {{ request.user.last_name }}</div>
+        <div class="profile-handle">
+          @{{ request.user.username }}
+          <span class="verified-badge">✔ Verified</span>
+        </div>
+      </div>
+      <div class="profile-edit-btn">
+        <!-- switches between view/edit mode -->
+        <button class="outline-btn" id="editToggleBtn" onclick="showEdit()">
+          <i class="fas fa-pen"></i> Edit Profile
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════ VIEW MODE ══════════ -->
+    <div id="view-mode">
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-tile s1 fade-up d1">
+          <div class="stat-icon-wrap">🛍️</div>
+          <div class="stat-value">{{ request.user.order_count|default:"0" }}</div>
+          <div class="stat-label">Total Orders</div>
+        </div>
+        <div class="stat-tile s2 fade-up d2">
+          <div class="stat-icon-wrap">⭐</div>
+          <div class="stat-value">4.8</div>
+          <div class="stat-label">Avg. Rating Given</div>
+        </div>
+        <div class="stat-tile s3 fade-up d3">
+          <div class="stat-icon-wrap">🏅</div>
+          <div class="stat-value">Gold</div>
+          <div class="stat-label">Member Tier</div>
+        </div>
+      </div>
+
+      <!-- INFO GRID -->
+      <div class="profile-grid">
+        <div class="panel fade-up d4">
+          <div class="panel-header">
+            <div class="panel-icon pi-red"><i class="fas fa-user"></i></div>
+            <div class="panel-title">Personal Info</div>
+          </div>
+          <div class="panel-body">
+            <div class="info-row">
+              <div class="info-key"><i class="fas fa-id-card" style="color:#e23744;"></i> First Name</div>
+              <div class="info-val">{{ request.user.first_name|default:"—" }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-key"><i class="fas fa-id-badge" style="color:#e23744;"></i> Last Name</div>
+              <div class="info-val">{{ request.user.last_name|default:"—" }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-key"><i class="fas fa-at" style="color:#e23744;"></i> Username</div>
+              <div class="info-val">@{{ request.user.username }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel fade-up d5">
+          <div class="panel-header">
+            <div class="panel-icon pi-blue"><i class="fas fa-address-book"></i></div>
+            <div class="panel-title">Contact Info</div>
+          </div>
+          <div class="panel-body">
+            <div class="info-row">
+              <div class="info-key"><i class="fas fa-phone" style="color:#2d82d2;"></i> Phone</div>
+              <div class="info-val">{{ request.user.phone|default:"—" }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-key"><i class="fas fa-envelope" style="color:#2d82d2;"></i> Email</div>
+              <div class="info-val" style="font-size:12px;">{{ request.user.email|default:"—" }}</div>
+            </div>
+            <div class="info-row">
+              <div class="info-key"><i class="fas fa-map-marker-alt" style="color:#2d82d2;"></i> City</div>
+              <div class="info-val">India 🇮🇳</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="actions-panel fade-up d5">
+        <a href="/my_orders" class="action-tile">
+          <div class="action-tile-icon" style="background:rgba(226,55,68,0.08);color:var(--zred);">🛍️</div>
+          My Orders
+        </a>
+        <a href="/reviews" class="action-tile">
+          <div class="action-tile-icon" style="background:rgba(244,169,42,0.1);color:#c47f00;">⭐</div>
+          My Reviews
+        </a>
+        <button class="action-tile" onclick="showEdit()">
+          <div class="action-tile-icon" style="background:rgba(79,172,254,0.1);color:#2d82d2;">✏️</div>
+          Edit Profile
+        </button>
+        <a href="/menu" class="action-tile">
+          <div class="action-tile-icon" style="background:rgba(61,155,109,0.1);color:var(--zgreen);">🍔</div>
+          Browse Menu
+        </a>
+        <a href="/logout" class="action-tile">
+          <div class="action-tile-icon" style="background:rgba(120,120,120,0.08);color:#888;">🚪</div>
+          Logout
+        </a>
+      </div>
+
+      <!-- MEMBER STRIP -->
+      <div class="member-strip fade-up d6">
+        <div class="member-left">
+          <div class="member-badge-icon">🏅</div>
+          <div class="member-text">
+            <strong>Gold Member</strong>
+            <span>Thank you for being a loyal Home of Flavours customer!</span>
+          </div>
+        </div>
+        <div class="member-chip">⚡ {{ request.user.order_count|default:"0" }} orders placed</div>
+      </div>
+
+    </div><!-- /#view-mode -->
+
+    <!-- ══════════ EDIT MODE ══════════ -->
+    <div id="edit-mode">
+
+      <form method="POST" action="/edit_profile">
+        {% csrf_token %}
+        <!-- hidden field so the view knows to process this form -->
+        <input type="hidden" name="from_profile" value="1">
+
+        <!-- Personal Info -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="form-card-icon fci-red"><i class="fas fa-user"></i></div>
+            <div class="form-card-title">Personal Information</div>
+          </div>
+          <div class="form-card-body">
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label"><i class="fas fa-id-card"></i> First Name</label>
+                <input type="text" name="first_name" class="field-input"
+                  placeholder="First name" value="{{ request.user.first_name }}">
+              </div>
+              <div class="field-group">
+                <label class="field-label"><i class="fas fa-id-badge"></i> Last Name</label>
+                <input type="text" name="last_name" class="field-input"
+                  placeholder="Last name" value="{{ request.user.last_name }}">
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="form-card-icon fci-blue"><i class="fas fa-address-book"></i></div>
+            <div class="form-card-title">Contact Information</div>
+          </div>
+          <div class="form-card-body">
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label"><i class="fas fa-phone"></i> Phone</label>
+                <input type="text" name="phone" class="field-input"
+                  placeholder="Phone number" value="{{ request.user.phone|default:'' }}">
+              </div>
+              
+            </div>
+          </div>
+        </div>
+
+        <!-- Change Password -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <div class="form-card-icon fci-dark"><i class="fas fa-lock"></i></div>
+            <div class="form-card-title">Change Password</div>
+          </div>
+          <div class="form-card-body">
+            <div class="divider">
+              <div class="divider-line"></div>
+              <div class="divider-text">Leave blank to keep current password</div>
+              <div class="divider-line"></div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label"><i class="fas fa-key"></i> New Password</label>
+                <div class="pw-wrap">
+                  <input type="password" name="password1" id="pw1" class="field-input"
+                    placeholder="New password" style="padding-right:42px;"
+                    oninput="checkStrength(this.value)">
+                  <button type="button" class="pw-toggle" onclick="togglePw('pw1',this)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                <div class="pw-strength-bar"><div class="pw-strength-fill" id="strengthFill"></div></div>
+                <div class="pw-strength-label" id="strengthLabel">—</div>
+              </div>
+              <div class="field-group">
+                <label class="field-label"><i class="fas fa-key"></i> Confirm Password</label>
+                <div class="pw-wrap">
+                  <input type="password" name="password2" id="pw2" class="field-input"
+                    placeholder="Confirm password" style="padding-right:42px;"
+                    oninput="checkMatch()">
+                  <button type="button" class="pw-toggle" onclick="togglePw('pw2',this)">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+                <div class="field-hint" id="matchHint" style="margin-top:6px;"></div>
+              </div>
+            </div>
+            <div class="danger-note">
+              ⚠️ After changing your password, you will remain logged in on this device.
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="btn-save">
+              <i class="fas fa-check"></i> Save Changes
+            </button>
+            <button type="button" class="btn-cancel" onclick="showView()">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </div><!-- /#edit-mode -->
+
+  </div><!-- /.profile-container -->
+</div>
+
+<script>
+  /* ── Mode switching ── */
+  function showEdit() {
+    document.getElementById('view-mode').style.display = 'none';
+    document.getElementById('edit-mode').style.display  = 'block';
+    document.getElementById('editToggleBtn').style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showView() {
+    document.getElementById('edit-mode').style.display  = 'none';
+    document.getElementById('view-mode').style.display  = 'block';
+    document.getElementById('editToggleBtn').style.display = 'inline-flex';
+  }
+
+  // If Django returned errors, stay in edit mode
+  {% if messages %}
+    {% for message in messages %}
+      {% if 'error' in message.tags %}
+        showEdit();
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  // ── Auto-dismiss toasts ──
+  document.querySelectorAll('.z-toast').forEach(function(el) {
+    setTimeout(function() {
+      el.style.transition = 'opacity 0.4s, transform 0.4s';
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(60px)';
+      setTimeout(function() { el.remove(); }, 400);
+    }, 3500);
+  });
+
+  // ── Password visibility toggle ──
+  function togglePw(id, btn) {
+    var inp  = document.getElementById(id);
+    var icon = btn.querySelector('i');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      icon.classList.replace('fa-eye','fa-eye-slash');
+    } else {
+      inp.type = 'password';
+      icon.classList.replace('fa-eye-slash','fa-eye');
+    }
+  }
+
+  // ── Password strength ──
+  function checkStrength(val) {
+    var fill  = document.getElementById('strengthFill');
+    var label = document.getElementById('strengthLabel');
+    if (!val) { fill.style.width='0%'; label.textContent='—'; label.style.color='#aaa'; return; }
+    var score = 0;
+    if (val.length >= 8)          score++;
+    if (/[A-Z]/.test(val))        score++;
+    if (/[0-9]/.test(val))        score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    var levels = [
+      { pct:'20%', color:'#e23744', text:'Very Weak' },
+      { pct:'40%', color:'#f4a92a', text:'Weak'      },
+      { pct:'65%', color:'#3d9b6d', text:'Good'      },
+      { pct:'100%',color:'#2d82d2', text:'Strong'    },
+    ];
+    var lvl = levels[Math.min(score-1, 3)] || levels[0];
+    fill.style.width      = lvl.pct;
+    fill.style.background = lvl.color;
+    label.textContent     = lvl.text;
+    label.style.color     = lvl.color;
+    checkMatch();
+  }
+
+  // ── Password match ──
+  function checkMatch() {
+    var pw1  = document.getElementById('pw1').value;
+    var pw2  = document.getElementById('pw2').value;
+    var hint = document.getElementById('matchHint');
+    if (!pw2) { hint.textContent = ''; return; }
+    if (pw1 === pw2) {
+      hint.textContent = '✔ Passwords match';       hint.style.color = '#3d9b6d';
+    } else {
+      hint.textContent = '✘ Passwords do not match'; hint.style.color = '#e23744';
+    }
+  }
+</script>
+
+{% endblock body %}

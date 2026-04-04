@@ -1,0 +1,615 @@
+{% extends 'base.html' %}
+
+{% block title %}Reviews — Home of Flavours{% endblock title %}
+
+{% block body %}
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Libre+Baskerville:ital@0;1&display=swap');
+
+  :root {
+    --zred: #e23744;
+    --zred-dark: #cb2d3a;
+    --zsurface: #f8f8f8;
+    --zcard: #ffffff;
+    --zinc: #1c1c1c;
+    --zmuted: #7b7b7b;
+    --zborder: #ebebeb;
+    --zstar: #f4a92a;
+    --zgreen: #3d9b6d;
+    --radius: 16px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.07);
+    --shadow-hover: 0 8px 28px rgba(0,0,0,0.12);
+  }
+
+  /* ── PAGE LAYOUT ── */
+  .reviews-page {
+    font-family: 'Nunito', sans-serif;
+    background: var(--zsurface);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ── HERO BANNER ── */
+  .reviews-hero {
+    background: linear-gradient(135deg, #e23744 0%, #c0392b 60%, #922b21 100%);
+    padding: 52px 0 120px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .reviews-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .reviews-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 80px;
+    background: var(--zsurface);
+    border-radius: 50% 50% 0 0 / 30px 30px 0 0;
+  }
+
+  .hero-content {
+    position: relative; z-index: 1;
+    text-align: center;
+    color: white;
+  }
+
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 13px; font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: 0.3px;
+  }
+
+  .hero-title {
+    font-size: 42px; font-weight: 900;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    opacity: 0.85;
+    font-weight: 500;
+  }
+
+  /* ── RATING SUMMARY CARD ── */
+  .summary-card {
+    background: var(--zcard);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-hover);
+    padding: 32px 36px;
+    margin-top: -64px;
+    position: relative; z-index: 10;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .big-score {
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .score-num {
+    font-size: 64px; font-weight: 900;
+    color: var(--zinc);
+    line-height: 1;
+    letter-spacing: -3px;
+  }
+
+  .score-stars {
+    display: flex; gap: 4px; justify-content: center;
+    margin: 8px 0 4px;
+  }
+
+  .star-icon { color: var(--zstar); font-size: 18px; }
+  .star-icon.empty { color: #ddd; }
+
+  .score-label { font-size: 13px; color: var(--zmuted); font-weight: 600; }
+
+  .score-divider {
+    width: 1px; height: 80px;
+    background: var(--zborder);
+    flex-shrink: 0;
+  }
+
+  .rating-bars { flex: 1; min-width: 200px; }
+
+  .bar-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .bar-label { font-size: 13px; font-weight: 700; color: var(--zmuted); width: 14px; text-align: right; }
+
+  .bar-track {
+    flex: 1; height: 7px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: var(--zstar);
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+  .bar-fill.green { background: var(--zgreen); }
+  .bar-fill.red   { background: var(--zred); }
+
+  .bar-count { font-size: 12px; color: var(--zmuted); width: 20px; font-weight: 600; }
+
+  .summary-stat {
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .summary-stat-num {
+    font-size: 28px; font-weight: 900;
+    color: var(--zinc);
+    letter-spacing: -1px;
+  }
+  .summary-stat-label { font-size: 12px; color: var(--zmuted); font-weight: 600; margin-top: 2px; }
+
+  /* ── WRITE REVIEW BOX ── */
+  .write-review-card {
+    background: var(--zcard);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 28px;
+    overflow: hidden;
+    border: 1px solid var(--zborder);
+  }
+
+  .write-review-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--zborder);
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .avatar-circle {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--zred), #c0392b);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 16px; font-weight: 800;
+    flex-shrink: 0;
+  }
+
+  .write-label { font-weight: 700; font-size: 15px; color: var(--zinc); }
+  .write-sub   { font-size: 12px; color: var(--zmuted); }
+
+  .write-review-body { padding: 20px 24px; }
+
+  /* Star Rating Picker */
+  .star-picker {
+    display: flex; gap: 6px; margin-bottom: 16px;
+  }
+
+  .star-picker input { display: none; }
+
+  .star-picker label {
+    font-size: 28px; cursor: pointer;
+    color: #ddd; transition: color 0.15s, transform 0.15s;
+    line-height: 1;
+  }
+
+  .star-picker label:hover,
+  .star-picker label:hover ~ label,
+  .star-picker input:checked ~ label { color: var(--zstar); }
+
+  .star-picker:hover label { color: var(--zstar); }
+  .star-picker label:hover ~ label { color: #ddd; }
+
+  .review-textarea {
+    width: 100%;
+    border: 1.5px solid var(--zborder);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: var(--zinc);
+    resize: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    background: #fafafa;
+    line-height: 1.6;
+  }
+
+  .review-textarea:focus {
+    border-color: var(--zred);
+    box-shadow: 0 0 0 3px rgba(226,55,68,0.08);
+    background: #fff;
+  }
+
+  .review-textarea::placeholder { color: #bbb; }
+
+  .char-counter {
+    text-align: right;
+    font-size: 12px;
+    color: var(--zmuted);
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, var(--zred) 0%, var(--zred-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 12px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(226,55,68,0.3);
+  }
+
+  .login-prompt {
+    padding: 24px;
+    display: flex; align-items: center; gap: 16px;
+    background: linear-gradient(135deg, #fff5f5, #fff);
+    border-radius: var(--radius);
+    border: 1.5px dashed rgba(226,55,68,0.25);
+    margin-bottom: 28px;
+  }
+
+  .login-prompt-icon {
+    width: 48px; height: 48px;
+    background: rgba(226,55,68,0.08);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+
+  .login-prompt-text { flex: 1; font-size: 14px; color: var(--zmuted); }
+  .login-prompt-text strong { color: var(--zinc); display: block; margin-bottom: 2px; font-size: 15px; }
+
+  .login-prompt-btn {
+    background: var(--zred);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: 0.2s;
+    white-space: nowrap;
+  }
+  .login-prompt-btn:hover { background: var(--zred-dark); color: white; }
+
+  /* ── SECTION HEADER ── */
+  .section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px;
+    flex-wrap: wrap; gap: 10px;
+  }
+
+  .section-title {
+    font-size: 20px; font-weight: 900;
+    color: var(--zinc); letter-spacing: -0.5px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .count-chip {
+    background: var(--zborder);
+    color: var(--zmuted);
+    font-size: 12px; font-weight: 800;
+    padding: 3px 10px; border-radius: 50px;
+  }
+
+  .sort-btn {
+    background: white; border: 1.5px solid var(--zborder);
+    border-radius: 8px; padding: 7px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px; font-weight: 700; color: var(--zmuted);
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: 0.2s;
+  }
+  .sort-btn:hover { border-color: var(--zred); color: var(--zred); }
+
+  /* ── REVIEW CARDS ── */
+  .reviews-list { display: flex; flex-direction: column; gap: 16px; }
+
+  .review-card {
+    background: var(--zcard);
+    border-radius: var(--radius);
+    border: 1px solid var(--zborder);
+    box-shadow: var(--shadow);
+    padding: 22px 24px;
+    transition: box-shadow 0.25s, transform 0.25s;
+    animation: reviewIn 0.4s ease both;
+  }
+
+  @keyframes reviewIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .review-card:nth-child(2) { animation-delay: 0.06s; }
+  .review-card:nth-child(3) { animation-delay: 0.12s; }
+  .review-card:nth-child(4) { animation-delay: 0.18s; }
+  .review-card:nth-child(5) { animation-delay: 0.24s; }
+
+  .review-card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  .review-top {
+    display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .reviewer-info { display: flex; align-items: center; gap: 12px; }
+
+  .reviewer-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e23744, #c0392b);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 17px; font-weight: 900;
+    flex-shrink: 0;
+    font-family: 'Libre Baskerville', serif;
+  }
+
+  .reviewer-name { font-size: 15px; font-weight: 800; color: var(--zinc); }
+  .reviewer-date { font-size: 12px; color: var(--zmuted); margin-top: 2px; font-weight: 600; }
+
+  .rating-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .rating-pill.high   { background: #e8f5ee; color: #2e7d52; }
+  .rating-pill.mid    { background: #fff8e1; color: #c27c00; }
+  .rating-pill.low    { background: #fdecea; color: #c0392b; }
+
+  .review-comment {
+    font-size: 14.5px;
+    color: #3a3a3a;
+    line-height: 1.75;
+    font-weight: 500;
+  }
+
+  .review-footer {
+    display: flex; align-items: center; gap: 16px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--zborder);
+  }
+
+  .helpful-btn {
+    background: none; border: 1.5px solid var(--zborder);
+    border-radius: 8px; padding: 6px 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px; font-weight: 700; color: var(--zmuted);
+    cursor: pointer; display: flex; align-items: center; gap: 6px;
+    transition: 0.2s;
+  }
+  .helpful-btn:hover { border-color: var(--zred); color: var(--zred); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--zcard);
+    border-radius: var(--radius);
+    border: 1px solid var(--zborder);
+  }
+  .empty-state-emoji { font-size: 56px; margin-bottom: 16px; }
+  .empty-state-title { font-size: 20px; font-weight: 800; color: var(--zinc); margin-bottom: 6px; }
+  .empty-state-sub   { font-size: 14px; color: var(--zmuted); }
+
+  @media (max-width: 640px) {
+    .summary-card { flex-direction: column; gap: 20px; }
+    .score-divider { display: none; }
+    .hero-title { font-size: 30px; }
+  }
+</style>
+
+<div class="reviews-page">
+
+  <!-- HERO -->
+  <div class="reviews-hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-tag">⭐ Customer Reviews</div>
+        <div class="hero-title">What people are saying</div>
+        <div class="hero-sub">Real reviews from real food lovers at Home of Flavours</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="max-width: 820px;">
+
+    <!-- RATING SUMMARY -->
+    <div class="summary-card">
+      <div class="big-score">
+        <div class="score-num">4.2</div>
+        <div class="score-stars">
+          <i class="fas fa-star star-icon"></i>
+          <i class="fas fa-star star-icon"></i>
+          <i class="fas fa-star star-icon"></i>
+          <i class="fas fa-star star-icon"></i>
+          <i class="fas fa-star-half-alt star-icon"></i>
+        </div>
+        <div class="score-label">Overall Rating</div>
+      </div>
+
+      <div class="score-divider"></div>
+
+      <div class="rating-bars">
+        <div class="bar-row">
+          <span class="bar-label">5</span>
+          <div class="bar-track"><div class="bar-fill green" style="width:65%"></div></div>
+          <span class="bar-count">65%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">4</span>
+          <div class="bar-track"><div class="bar-fill green" style="width:20%"></div></div>
+          <span class="bar-count">20%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">3</span>
+          <div class="bar-track"><div class="bar-fill" style="width:8%"></div></div>
+          <span class="bar-count">8%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">2</span>
+          <div class="bar-track"><div class="bar-fill red" style="width:4%"></div></div>
+          <span class="bar-count">4%</span>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">1</span>
+          <div class="bar-track"><div class="bar-fill red" style="width:3%"></div></div>
+          <span class="bar-count">3%</span>
+        </div>
+      </div>
+
+      <div class="score-divider"></div>
+
+      <div class="summary-stat">
+        <div class="summary-stat-num">{{ reviews|length }}</div>
+        <div class="summary-stat-label">Total Reviews</div>
+      </div>
+    </div>
+
+    <!-- WRITE REVIEW / LOGIN PROMPT -->
+    {% if user.is_authenticated %}
+    <div class="write-review-card">
+      <div class="write-review-header">
+        <div class="avatar-circle">{{ user.username|slice:":1"|upper }}</div>
+        <div>
+          <div class="write-label">{{ user.username }}</div>
+          <div class="write-sub">Share your experience</div>
+        </div>
+      </div>
+      <div class="write-review-body">
+        <form method="POST" action="/reviews">
+          {% csrf_token %}
+          <div class="star-picker" title="Rate your experience">
+            <input type="radio" id="s5" name="rating" value="5"><label for="s5">★</label>
+            <input type="radio" id="s4" name="rating" value="4"><label for="s4">★</label>
+            <input type="radio" id="s3" name="rating" value="3"><label for="s3">★</label>
+            <input type="radio" id="s2" name="rating" value="2"><label for="s2">★</label>
+            <input type="radio" id="s1" name="rating" value="1"><label for="s1">★</label>
+          </div>
+          <textarea
+            name="comment"
+            id="comment"
+            class="review-textarea"
+            rows="4"
+            maxlength="250"
+            required
+            placeholder="What did you love? The biryani? The quick service? Tell everyone! 🍕"
+            oninput="document.getElementById('charCount').textContent = 250 - this.value.length"
+          ></textarea>
+          <div class="char-counter"><span id="charCount">250</span> characters left</div>
+          <button type="submit" class="submit-btn">
+            <i class="fas fa-paper-plane"></i> Post Review
+          </button>
+        </form>
+      </div>
+    </div>
+    {% else %}
+    <div class="login-prompt">
+      <div class="login-prompt-icon">✍️</div>
+      <div class="login-prompt-text">
+        <strong>Share your experience</strong>
+        Login to write a review and help others discover great food!
+      </div>
+      <a href="/login" class="login-prompt-btn">Login to Review</a>
+    </div>
+    {% endif %}
+
+    <!-- REVIEWS LIST -->
+    <div class="section-header">
+      <div class="section-title">
+        All Reviews
+        <span class="count-chip">{{ reviews|length }}</span>
+      </div>
+      <button class="sort-btn"><i class="fas fa-sort-amount-down"></i> Most Recent</button>
+    </div>
+
+    {% if reviews %}
+    <div class="reviews-list">
+      {% for r in reviews %}
+      <div class="review-card">
+        <div class="review-top">
+          <div class="reviewer-info">
+            <div class="reviewer-avatar">{{ r.name|slice:":1"|upper }}</div>
+            <div>
+              <div class="reviewer-name">{{ r.name }}</div>
+              <div class="reviewer-date">📅 {{ r.r_date }}</div>
+            </div>
+          </div>
+          <!-- Rating pill — shows green for high scores. Adjust if you have a rating field -->
+          <div class="rating-pill high">
+            <i class="fas fa-star" style="font-size:11px;"></i> 4.5
+          </div>
+        </div>
+
+        <div class="review-comment">"{{ r.comment }}"</div>
+
+        <div class="review-footer">
+          <button class="helpful-btn" onclick="this.innerHTML='👍 Helpful (1)'; this.style.borderColor='var(--zred)'; this.style.color='var(--zred)';">
+            👍 Helpful
+          </button>
+          <span style="font-size:12px; color:var(--zmuted); font-weight:600; margin-left: auto;">
+            <i class="fas fa-check-circle" style="color: var(--zgreen);"></i> Verified Order
+          </span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-emoji">🍽️</div>
+      <div class="empty-state-title">No reviews yet!</div>
+      <div class="empty-state-sub">Be the first to share your Home of Flavours experience.</div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  // Reverse star picker so clicking works L→R visually
+  const picker = document.querySelector('.star-picker');
+  if (picker) {
+    picker.style.flexDirection = 'row-reverse';
+    picker.style.justifyContent = 'flex-end';
+  }
+</script>
+
+{% endblock body %}
