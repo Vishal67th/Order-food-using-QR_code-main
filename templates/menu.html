@@ -197,6 +197,11 @@
       margin-right: auto;
     }
     
+    /* =============================================
+       CATEGORY BUTTON — PNG icon version
+       All effects (hover, active, underline) kept
+       exactly the same as the original emoji version
+    ============================================= */
     .category-btn {
       display: flex;
       flex-direction: column;
@@ -211,11 +216,11 @@
       font-weight: 600;
       position: relative;
     }
-    
-    .category-btn::before {
-      content: '';
-      width: 80px;
-      height: 80px;
+
+    /* The icon wrapper replaces the ::before pseudo-element */
+    .cat-icon-box {
+      width: 100px;
+      height: 100px;
       border-radius: 12px;
       background: linear-gradient(135deg, #f5f5f5 0%, #efefef 100%);
       display: flex;
@@ -223,32 +228,28 @@
       justify-content: center;
       transition: all 0.3s ease;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      font-size: 40px;
     }
 
-    .category-btn:nth-child(1)::before { content: '🍽️'; }
-    .category-btn:nth-child(2)::before { content: '🍰'; }
-    .category-btn:nth-child(3)::before { content: '🍛'; }
-    .category-btn:nth-child(4)::before { content: '🍨'; }
-    .category-btn:nth-child(5)::before { content: '🧀'; }
-    .category-btn:nth-child(6)::before { content: '🥤'; }
-    .category-btn:nth-child(7)::before { content: '🍕'; }
-    .category-btn:nth-child(8)::before { content: '🍢'; }
-    .category-btn:nth-child(9)::before { content: '🍞'; }
-    .category-btn:nth-child(10)::before { content: '🍚'; }
-    .category-btn:nth-child(11)::before { content: '🥣'; }
-    .category-btn:nth-child(12)::before { content: '🥟'; }
-    
-    .category-btn:hover::before,
-    .category-btn.active::before {
+    .cat-icon-box img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      transition: all 0.3s ease;
+    }
+
+    /* Hover & active: red background on icon box — same as original */
+    .category-btn:hover .cat-icon-box,
+    .category-btn.active .cat-icon-box {
       background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
       box-shadow: 0 4px 12px rgba(230,57,70,0.2);
       transform: scale(1.08);
     }
-    
+
+    /* Label color change on hover/active — same as original */
     .category-btn:hover,
     .category-btn.active { color: #e63946; font-weight: 700; }
-    
+
+    /* Green underline on active — same as original */
     .category-btn.active::after {
       content: '';
       position: absolute;
@@ -261,6 +262,9 @@
       margin: 0 auto;
       width: 50px;
     }
+
+    /* Suppress old ::before so nothing conflicts */
+    .category-btn::before { display: none !important; }
     
     .menu-grid {
       display: grid;
@@ -412,7 +416,8 @@
     
     @media (max-width: 480px) {
       .category-filter { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .category-btn::before { width: 60px; height: 60px; }
+      .cat-icon-box { width: 60px; height: 60px; }
+      .cat-icon-box img { width: 36px; height: 36px; }
     }
 </style>
 
@@ -431,27 +436,99 @@
   </div>
 </div>
 
-<!-- ✅ FIX: All data-category values are lowercase to match DB values -->
+<!-- Category Filter — PNG icons, same effects as before -->
 <div class="category-filter" id="categoryFilter">
-  <button class="category-btn active" data-category="all"> All</button>
-  <button class="category-btn" data-category="desserts"> Desserts</button>
-  <button class="category-btn" data-category="north indian"> North Indian</button>
-  <button class="category-btn" data-category="ice cream">Ice Cream</button>
-  <button class="category-btn" data-category="paneer"> Paneer</button>
-  <button class="category-btn" data-category="beverages"> Beverages</button>
-  <button class="category-btn" data-category="pizza"> Pizza</button>
-  <button class="category-btn" data-category="starter"> Starter</button>
-  <button class="category-btn" data-category="bread"> Bread</button>
-  <button class="category-btn" data-category="rice"> Rice</button>
-  <button class="category-btn" data-category="dal"> Dal</button>
-  <button class="category-btn" data-category="papad"> Papad</button>
+
+  <button class="category-btn active" data-category="all">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Plate_All.png" alt="All">
+    </div>
+    All
+  </button>
+
+  <button class="category-btn" data-category="desserts">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Dessert_Cake.png" alt="Desserts">
+    </div>
+    Desserts
+  </button>
+
+  <button class="category-btn" data-category="north indian">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Dal_Yellow.png" alt="North Indian">
+    </div>
+    North Indian
+  </button>
+
+  <button class="category-btn" data-category="ice cream">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/IceCream_Bowl.png" alt="Ice Cream">
+    </div>
+    Ice Cream
+  </button>
+
+  <button class="category-btn" data-category="paneer">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Paneer.png" alt="Paneer">
+    </div>
+    Paneer
+  </button>
+
+  <button class="category-btn" data-category="beverages">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Beverages_Drink.png" alt="Beverages">
+    </div>
+    Beverages
+  </button>
+
+  <button class="category-btn" data-category="pizza">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Pizza.png" alt="Pizza">
+    </div>
+    Pizza
+  </button>
+
+  <button class="category-btn" data-category="starter">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Starter_Kebab.png" alt="Starter">
+    </div>
+    Starter
+  </button>
+
+  <button class="category-btn" data-category="bread">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Bread.png" alt="Bread">
+    </div>
+    Bread
+  </button>
+
+  <button class="category-btn" data-category="rice">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Rice.png" alt="Rice">
+    </div>
+    Rice
+  </button>
+
+  <button class="category-btn" data-category="dal">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Dal.png" alt="Dal">
+    </div>
+    Dal
+  </button>
+
+  <button class="category-btn" data-category="papad">
+    <div class="cat-icon-box">
+      <img src="/static/food_icons/Papad.png" alt="Papad">
+    </div>
+    Papad
+  </button>
+
 </div>
 
 <!-- Menu Grid -->
 <div class="menu-grid" id="menuGrid">
   {% for category, items in items_by_category.items %}
     {% for item in items %}
-      <!-- ✅ FIX: data-category and data-name are both lowercase for consistent JS matching -->
       <div class="food-card"
            data-category="{{ item.category|lower }}"
            data-name="{{ item.name|lower }}">
@@ -615,50 +692,41 @@
     document.head.appendChild(style);
   }
 
-  // ✅ FIX: Search now uses .toLowerCase() on both sides — case-insensitive match
   const searchInput = document.getElementById('searchInput');
   if (searchInput) {
     searchInput.addEventListener('keyup', function(e) {
       const searchTerm = e.target.value.toLowerCase().trim();
       const cards = document.querySelectorAll('.food-card');
-      
       cards.forEach(card => {
-        // ✅ data-name is already lowercase from Django template
         const name = (card.dataset.name || '').toLowerCase();
         card.style.display = name.includes(searchTerm) ? '' : 'none';
       });
     });
   }
 
-  // URL params
-  const urlParams   = new URLSearchParams(window.location.search);
+  const urlParams       = new URLSearchParams(window.location.search);
   const categoryFromUrl = urlParams.get('category');
-  const tableValue  = urlParams.get('table');
+  const tableValue      = urlParams.get('table');
   
   if (tableValue) {
     localStorage.setItem('tableValue', tableValue);
   }
   
   if (categoryFromUrl) {
-    // ✅ FIX: normalize URL param to lowercase before matching button
     const categoryBtn = document.querySelector(`[data-category="${categoryFromUrl.toLowerCase()}"]`);
     if (categoryBtn) categoryBtn.click();
   }
   
-  // ✅ FIX: Category filter now normalizes both button value and card value to lowercase
   document.querySelectorAll('.category-btn').forEach(btn => {
     btn.addEventListener('click', function() {
       document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
       this.classList.add('active');
       
-      // Button data-category is already lowercase
       const selectedCategory = this.dataset.category.toLowerCase();
       const cards = document.querySelectorAll('.food-card');
       
       cards.forEach(card => {
-        // ✅ card data-category is lowercase from Django template
         const cardCategory = (card.dataset.category || '').toLowerCase();
-        
         if (selectedCategory === 'all' || cardCategory === selectedCategory) {
           card.style.display = '';
         } else {
