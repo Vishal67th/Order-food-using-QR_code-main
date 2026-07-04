@@ -3,3 +3,4 @@ Pillow==11.3.0
 django-unfold==0.15.0
 gunicorn==23.0.0
 qrcode[pil]==7.4.2
+whitenoise==6.9.0
