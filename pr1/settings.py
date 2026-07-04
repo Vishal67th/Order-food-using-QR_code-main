@@ -22,14 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-^#ku(-=1nwd8wnfe&1eri+k)_(8g@!n*#p3&!i4=!!c)&rhl3v'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 USE_TZ = False
 
 ALLOWED_HOSTS = [
-    'e0398dde-191c-43d5-8dfc-bc9e465afc40.id.repl.co',
-    
-    '127.0.0.1',
-    'localhost'
+    "127.0.0.1",
+    "localhost",
+    ".onrender.com",
+    "*",
 ]
 
 # Application definition
@@ -137,7 +137,7 @@ AUTH_USER_MODEL = 'cafe.User'
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
